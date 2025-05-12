@@ -1,129 +1,196 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView, TextInput, StyleSheet } from "react-native";
-import { colors, fontType } from "./src/assets/theme"; // Sesuaikan path ke file tema
-
-const foodData = [
-  {
-    name: "Warung Mekar Jaya",
-    rating: 4.5,
-    image: { uri: "https://assets.pikiran-rakyat.com/crop/0x469%3A1400x1717/1200x675/photo/2024/04/07/3583402426.png" },
-    location: "Jl. Soekarno Hatta No.2, Malang"
-  },
-  {
-    name: "Depot Mie Gadjah Mada 1",
-    rating: 4.7,
-    image: { uri: "https://media-cdn.yummyadvisor.com/store/95b1876a-cb66-4b02-9d5b-8cec57dd014c.jpg?x-oss-process=style%2Ftype_11" },
-    location: "Jl. Pasar No. 17A, Sukoharjo, Klojen, Malang"
-  },
-  {
-    name: "Rawon Tessy",
-    rating: 4.6,
-    image: { uri: "https://media-cdn.tripadvisor.com/media/photo-s/18/c2/22/e8/rawon-tessy.jpg" },
-    location: "Jl. Trunojoyo No. 10, Klojen, Malang"
-  },
-  {
-    name: "Bakso Damas",
-    rating: 4.8,
-    image: { uri: "https://www.pilar.id/wp-content/uploads/2023/07/img-pilar77-49.jpg" },
-    location: "Jl. Soekarno Hatta No. 70, Mojolangu, Lowokwaru, Malang"
-  },
-  {
-    name: "Warung Cak Pi'i",
-    rating: 4.4,
-    image: { uri: "https://media-cdn.tripadvisor.com/media/photo-m/1280/15/fc/0e/95/img20190106112424-largejpg.jpg" },
-    location: "Jl. Letjen Sutoyo No.14, Lowokwaru, Malang"
-  }
-];
+import {View,Text,TouchableOpacity,Image,ScrollView,TextInput,StyleSheet} from "react-native";
+import { colors, fontType } from "./src/assets/theme";
+import { foodData, drinkData } from "./src/data";
 
 const App = () => {
-  const [selectedMenu, setSelectedMenu] = useState("Makanan"); // Menyimpan menu yang dipilih
+  const [selectedMenu, setSelectedMenu] = useState("Makanan");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredData = foodData.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const combinedData = [...foodData, ...drinkData];
+
+  const filteredData = combinedData.filter(
+    item =>
+      item.category === selectedMenu &&
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Konten Menu */}
-      <ScrollView style={[styles.container, { backgroundColor: colors.background() }]}>
-        <Text style={[styles.header, { color: colors.black(), fontFamily: fontType['Pjs-Bold'] }]}>FOODSNAP MALANG</Text>
+    <View style={{ flex: 1, backgroundColor: colors.background() }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingTop: 40,
+          paddingHorizontal: 16,
+          paddingBottom: 120
+        }}
+      >
+        <Text
+          style={[
+            styles.header,
+            { color: colors.black(), fontFamily: fontType["Pjs-Bold"] }
+          ]}
+        >
+          FOODSNAP MALANG
+        </Text>
 
         <TextInput
-          style={[styles.searchInput, { backgroundColor: colors.searchBackground() }]}
+          style={[
+            styles.searchInput,
+            { backgroundColor: colors.searchBackground() }
+          ]}
           placeholder="Cari Nama Restoran..."
           value={searchQuery}
           onChangeText={text => setSearchQuery(text)}
         />
 
+        {/* Menu Tab */}
         <View style={styles.menuSelector}>
           <TouchableOpacity
             onPress={() => setSelectedMenu("Makanan")}
             style={[
               styles.menuButton,
-              selectedMenu === "Makanan" && { backgroundColor: colors.blue() }
+              selectedMenu === "Makanan" && {
+                backgroundColor: colors.blue()
+              }
             ]}
           >
-            <Text style={[styles.menuText, { color: colors.white(), fontFamily: fontType['Pjs-Medium'] }]}>Makanan</Text>
+            <Text
+              style={[
+                styles.menuText,
+                {
+                  color: colors.white(),
+                  fontFamily: fontType["Pjs-Medium"]
+                }
+              ]}
+            >
+              Makanan
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setSelectedMenu("Minuman")}
             style={[
               styles.menuButton,
-              selectedMenu === "Minuman" && { backgroundColor: colors.blue() }
+              selectedMenu === "Minuman" && {
+                backgroundColor: colors.blue()
+              }
             ]}
           >
-            <Text style={[styles.menuText, { color: colors.white(), fontFamily: fontType['Pjs-Medium'] }]}>Minuman</Text>
+            <Text
+              style={[
+                styles.menuText,
+                {
+                  color: colors.white(),
+                  fontFamily: fontType["Pjs-Medium"]
+                }
+              ]}
+            >
+              Minuman
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Warung Mekar Jaya di tengah besar */}
-        <View style={styles.bigCardContainer}>
-          <Image
-            source={foodData[0].image}
-            style={styles.cardImage}
-            resizeMode="cover"
-          />
-          <Text style={[styles.cardTitle, { fontSize: 30, fontFamily: fontType['Pjs-SemiBold'], textAlign: 'center' }]}>
-            {foodData[0].name}
-          </Text>
-          <Text style={[styles.cardLocation, { fontFamily: fontType['Pjs-Regular'], textAlign: 'center' }]}>
-            {foodData[0].location}
-          </Text>
-          <Text style={[styles.cardRating, { fontFamily: fontType['Pjs-Medium'], color: colors.cardRatingColor() }]}>
-            Rating: {foodData[0].rating}
-          </Text>
-        </View>
-
-        {/* Makanan lain kotak-kotak kecil */}
-        <View style={styles.cardContainer}>
-          {filteredData.slice(1).map((item, index) => (
-            <View key={index} style={styles.card}>
+        {/* 2 kartu besar pertama */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+          {filteredData.slice(0, 2).map((item, index) => (
+            <View
+              key={index}
+              style={[styles.bigCardContainer, { width: 300, marginRight: 16 }]}
+            >
               <Image
                 source={item.image}
                 style={styles.cardImage}
                 resizeMode="cover"
               />
-              <Text style={[styles.cardTitle, { fontFamily: fontType['Pjs-SemiBold'] }]}>{item.name}</Text>
-              <Text style={[styles.cardLocation, { fontFamily: fontType['Pjs-Regular'] }]}>{item.location}</Text>
-              <Text style={[styles.cardRating, { fontFamily: fontType['Pjs-Medium'], color: colors.cardRatingColor() }]}>
+              <Text
+                style={[
+                  styles.cardTitle,
+                  {
+                    fontSize: 24,
+                    fontFamily: fontType["Pjs-SemiBold"],
+                    textAlign: "center"
+                  }
+                ]}
+              >
+                {item.name}
+              </Text>
+              <Text
+                style={[
+                  styles.cardLocation,
+                  {
+                    fontFamily: fontType["Pjs-Regular"],
+                    textAlign: "center"
+                  }
+                ]}
+              >
+                {item.location}
+              </Text>
+              <Text
+                style={[
+                  styles.cardRating,
+                  {
+                    fontFamily: fontType["Pjs-Medium"],
+                    color: colors.cardRatingColor()
+                  }
+                ]}
+              >
                 Rating: {item.rating}
               </Text>
             </View>
           ))}
-          {filteredData.length === 0 && (
-            <Text style={{ textAlign: "center", marginTop: 20 }}>Restoran tidak ditemukan.</Text>
-          )}
+        </ScrollView>
+
+        {/* Kartu kecil lainnya */}
+        <View style={styles.cardContainer}>
+          {filteredData.slice(2).map((item, index) => (
+            <View key={index} style={styles.card}>
+              <Image
+                source={item.image}
+                style={{ width: "100%", height: 80, borderRadius: 6 }}
+              />
+              <Text
+                style={[
+                  styles.cardTitle,
+                  {
+                    fontFamily: fontType["Pjs-Medium"],
+                    fontSize: 14,
+                    marginTop: 6
+                  }
+                ]}
+              >
+                {item.name}
+              </Text>
+              <Text style={[styles.cardLocation, { fontSize: 12 }]}>
+                {item.location}
+              </Text>
+              <Text style={[styles.cardRating, { fontSize: 12 }]}>
+                Rating: {item.rating}
+              </Text>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation tetap menempel di bawah */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navButton}>
-          <Text style={[styles.navText, { color: colors.white(), fontFamily: fontType['Pjs-SemiBold'] }]}>Menu</Text>
+          <Text
+            style={[
+              styles.navText,
+              { color: colors.white(), fontFamily: fontType["Pjs-SemiBold"] }
+            ]}
+          >
+            Menu
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton}>
-          <Text style={[styles.navText, { color: colors.white(), fontFamily: fontType['Pjs-SemiBold'] }]}>Profile</Text>
+          <Text
+            style={[
+              styles.navText,
+              { color: colors.white(), fontFamily: fontType["Pjs-SemiBold"] }
+            ]}
+          >
+            Profile
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -131,11 +198,6 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    flex: 1
-  },
   header: {
     fontSize: 24,
     textAlign: "center",
@@ -185,8 +247,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 10,
     padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: colors.cardShadow(0.2),
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
@@ -209,15 +271,22 @@ const styles = StyleSheet.create({
   cardRating: {
     fontSize: 12
   },
-  bottomNav: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 16,
-    backgroundColor: colors.white, // Menggunakan warna biru transparan
-    borderRadius: 10,
-    paddingHorizontal: 16
-  },
+  bottomNav: 
+{
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  paddingVertical: 16,
+  backgroundColor: colors.background(),
+  borderTopWidth: 1,
+  borderTopColor: '#ccc',
+  elevation: 5,
+  zIndex: 10 
+},
   navButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -227,7 +296,7 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 16,
     color: colors.white(),
-    fontFamily: fontType['Pjs-Medium']
+    fontFamily: fontType["Pjs-Medium"]
   }
 });
 
